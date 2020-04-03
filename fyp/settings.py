@@ -130,9 +130,9 @@ from pathlib import Path
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = (
-    os.path.join(Path(BASE_DIR).parent),
+    os.path.join(Path(BASE_DIR),'frontend','static'),
 )
 
 STATIC_URL = '/static/'
 
-print(STATIC_ROOT)
+print(os.path.join(Path(BASE_DIR),'frontend','static'))
