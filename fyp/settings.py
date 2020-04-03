@@ -129,6 +129,7 @@ USE_TZ = True
 from pathlib import Path
 
 STATIC_ROOT = os.path.join(Path(BASE_DIR).parent,'frontend','static','frontend')
+STATICFILES_DIRS = os.path.join(Path(BASE_DIR).parent,'frontend','static','frontend')
 
 STATIC_URL = '/static/'
 
