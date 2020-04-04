@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
 import './App.css';
-import regeneratorRuntime from "regenerator-runtime";
 
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
 import Container from '@material-ui/core/Container';
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button} from '@material-ui/core'
+import Cookies from 'js-cookie'
 
 class App extends Component {
     constructor(props){
@@ -188,7 +188,18 @@ class App extends Component {
             distance: this.state.distance,
             RouteCoordinate: this.state.RouteCoordinate
         };
-        const fetchURL = ''
+        let formData = new FormData();
+        let csrftoken = Cookies.get('csrftoken');
+        formData.append('distance', data.distance);
+        formData.append('distance', JSON.stringify(data.RouteCoordinate));
+        data.append('csrfmiddlewaretoken', $('#csrf-helper input[name="csrfmiddlewaretoken"]').attr('value'));
+        const fetchURL = 'https://intense-earth-97794.herokuapp.com/'
+        fetch(fetchURL,{
+            method: 'post',
+            body: 'formData',
+            mode: 'cors',
+            credentials: 'same-origin',
+        })
         //POST /database
     }
 
