@@ -2,9 +2,11 @@ from django.shortcuts import render
 from .models import frontend
 from .Form import Form
 import json
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 
+@ensure_csrf_cookie
 def index(request):
     # return render(request, 'frontend/index.html')
 
