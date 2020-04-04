@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { render } from "react-dom";
 import './App.css';
 
+import regeneratorRuntime from "regenerator-runtime";
+
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
@@ -25,7 +27,7 @@ class App extends Component {
             CurrentLocationMarker: null,
             TargetLocationMarker: null,
             RouteLine: null,
-            distance:null,
+            distance:0,
             RouteCoordinate:[{
                 lat:22.2888619,
                 lng:113.9417394	
@@ -189,18 +191,18 @@ class App extends Component {
             distance: this.state.distance,
             RouteCoordinate: this.state.RouteCoordinate
         };
-        let formData = new FormData();
         let csrftoken = Cookies.get('csrftoken');
-        formData.append('distance', data.distance);
-        formData.append('distance', JSON.stringify(data.RouteCoordinate));
-        data.append('csrfmiddlewaretoken', $('#csrf-helper input[name="csrfmiddlewaretoken"]').attr('value'));
         const fetchURL = window.location.href
         fetch(fetchURL,{
             method: 'post',
-            body: 'formData',
+            body: JSON.stringify(data),
             mode: 'cors',
             credentials: 'same-origin',
-        }).then(()=>{console.log('Post request send sucessfully')})
+            headers:{ "X-CSRFToken": csrftoken },
+        }).then((response)=>{console.log('Post request send sucessfully')
+        //console.log(JSON.stringify(formData.get('distance')))
+        //console.log(JSON.stringify(response.body))
+        })
         .catch((err)=>{console.log(`The error is:${err}`)})
         console.log('Button Click')
         //POST /database
@@ -211,22 +213,21 @@ class App extends Component {
         //console.log(this.state.RouteLine)
         const MapStyle={
             margin:'5%',
-            height:'33vh'
+            height:'95%'
         }
 
         const FormStyle={
             margin:'5%',
-            height:'50vh',
+            height:'95%',
         }
 
         return (
             <div>
-                <Container maxWidth="lg" style={{height: '10vh'}}>
 
+                <Container maxWidth="lg" style={{height: '55vh'}}>
+                    <div id='map' style={MapStyle} currentlatitude={this.props.currentlatitude} currentlongtitude={this.props.currentlongtitude}></div>
                 </Container>
-                <Container maxWidth="lg" style={{height: '35vh'}}>
-                <div id='map' style={MapStyle} currentlatitude={this.props.currentlatitude} currentlongtitude={this.props.currentlongtitude}></div>
-                </Container>
+
                 <Container maxWidth="sm" style={{height: '10vh'}}>
                     <div style={FormStyle}>
                         <form noValidate autoComplete="off">
@@ -243,7 +244,8 @@ class App extends Component {
                         </form>
                     </div>
                 </Container>
-                <Container maxWidth='lg' style ={{height:'20vh'}}>
+                <Container style={{height:'2vh'}}/>
+                <Container maxWidth='lg' style ={{height:'25vh'}}>
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
@@ -275,10 +277,11 @@ class App extends Component {
                         </Table>
                     </TableContainer>
                 </Container>
+                <Container style={{height:'2vh'}}/>
                 <Container maxWidth="sm" style={{height: '10vh'}}>
                     <Button variant="contained" color="primary" fullWidth={true} style={{textAlign: 'center', height:'100%'}} onClick={this.SubmitForm}>Submit</Button>
                 </Container>
-
+                <Container style={{height:'2vh'}}/>
             </div>
         )
     }
@@ -286,4 +289,7 @@ class App extends Component {
 }
 
 export default App;
+
+const container = document.getElementById("app");
+render(<App />, container);
 

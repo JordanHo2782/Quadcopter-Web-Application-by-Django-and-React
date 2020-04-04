@@ -12,6 +12,7 @@ djongo = "*"
 pymongo = {extras = ["srv"],version = "*"}
 jsonfield = "*"
 gunicorn = "*"
+json = "*"
 
 [requires]
 python_version = "3.7"
