@@ -13,6 +13,7 @@ class App extends Component {
     constructor(props){
         super(props)
         this.ButtonOnClick=this.ButtonOnClick.bind(this)
+        this.SubmitForm=this.SubmitForm.bind(this)
         this.state={
             currentlatitude: 22.28552,
             currentlongtitude: 114.15769,
@@ -193,13 +194,15 @@ class App extends Component {
         formData.append('distance', data.distance);
         formData.append('distance', JSON.stringify(data.RouteCoordinate));
         data.append('csrfmiddlewaretoken', $('#csrf-helper input[name="csrfmiddlewaretoken"]').attr('value'));
-        const fetchURL = 'https://intense-earth-97794.herokuapp.com/'
+        const fetchURL = window.location.href
         fetch(fetchURL,{
             method: 'post',
             body: 'formData',
             mode: 'cors',
             credentials: 'same-origin',
-        })
+        }).then(()=>{console.log('Post request send sucessfully')})
+        .catch((err)=>{console.log(`The error is:${err}`)})
+        console.log('Button Click')
         //POST /database
     }
 
@@ -273,7 +276,7 @@ class App extends Component {
                     </TableContainer>
                 </Container>
                 <Container maxWidth="sm" style={{height: '10vh'}}>
-                    <Button variant="contained" color="secondary" fullWidth={true} style={{textAlign: 'center', height:'100%'}} onClick={this.SubmitForm()}>Submit</Button>
+                    <Button variant="contained" color="primary" fullWidth={true} style={{textAlign: 'center', height:'100%'}} onClick={this.SubmitForm}>Submit</Button>
                 </Container>
 
             </div>
@@ -284,5 +287,3 @@ class App extends Component {
 
 export default App;
 
-const container = document.getElementById("app");
-render(<App />, container);

@@ -81,10 +81,10 @@ DATABASES = {
         'ENGINE': 'djongo',
         'NAME': 'Jordan',
         'CLIENT':{
-            'host': os.environ.get('MONGODB_HOST'),
-            'port': os.environ.get('MONGODB_PORT'),
-            'username': os.environ.get('MONGODB_USERNAME'),
-            'password': os.environ.get('MONGODB_PASSWORD'),
+            'host': 'mongodb+srv://admin:admin@jordan-s4z4c.azure.mongodb.net/test',
+            'port': 27017,
+            'username': 'admin',
+            'password': 'admin',
         }
     }
 }
