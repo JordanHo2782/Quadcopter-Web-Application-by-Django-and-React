@@ -28,6 +28,7 @@ class App extends Component {
             TargetLocationMarker: null,
             RouteLine: null,
             distance:0,
+            BatteryLevel:null,
             RouteCoordinate:[{
                 lat:22.2888619,
                 lng:113.9417394	
@@ -45,7 +46,7 @@ class App extends Component {
 
         let AddressInputValue = document.getElementsByName('Destination')[0].value;
 
-        let GeoCodeURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${AddressInputValue}&key=<GEOCODE_API_KEY>`
+        let GeoCodeURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${AddressInputValue}&key=AIzaSyDTSKXMgk0uJMl5ZqrlnwETSLB0dlypp2E`
 
         fetch(GeoCodeURL).then(res=>{return res.json()}).then(data=>{
             this.setState({
@@ -70,7 +71,7 @@ class App extends Component {
 
     componentWillMount(){
         const setLocation = ()=>{
-            let GeoLocateurl = 'https://www.googleapis.com/geolocation/v1/geolocate?key=<GEOLOCATE_API_KEY>'
+            let GeoLocateurl = 'https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyDTSKXMgk0uJMl5ZqrlnwETSLB0dlypp2E'
             
             fetch(GeoLocateurl,{method: 'POST'}).then(res=>{return res.json()}).then(data=>{
               this.setState({
@@ -79,7 +80,7 @@ class App extends Component {
               });
               return {currentlatitude: data.location.lat, currentlongtitude: data.location.lng,}
           }).then(data=>{
-              fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${data.currentlatitude},${data.currentlongtitude}&key=<GEOCODE_API_KEY>`).then(res=>{
+              fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${data.currentlatitude},${data.currentlongtitude}&key=AIzaSyDTSKXMgk0uJMl5ZqrlnwETSLB0dlypp2E`).then(res=>{
                 return res.json()
               }).then(data=>{
                   this.setState({
@@ -142,7 +143,7 @@ class App extends Component {
                         lat: this.state.targetlatituide,
                         lng: this.state.targetlongtitude,
                     })
-                    let GeoCodeURL = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${event.latLng.lat()},${event.latLng.lng()}&key=<GEOCODE_API_KEY>`
+                    let GeoCodeURL = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${event.latLng.lat()},${event.latLng.lng()}&key=AIzaSyDTSKXMgk0uJMl5ZqrlnwETSLB0dlypp2E`
                     fetch(GeoCodeURL).then(res=>{return res.json()}).then(data=>{
                         this.setState({
                             targetAddress: data.results[0].formatted_address
@@ -164,11 +165,11 @@ class App extends Component {
                 script.defer = true
                 index.parentNode.insertBefore(script, index)
             }
-            loadScript('https://maps.googleapis.com/maps/api/js?key=<MAP_API_KEY>&callback=initMap');
+            loadScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyDTSKXMgk0uJMl5ZqrlnwETSLB0dlypp2E&callback=initMap');
             window.initMap = initMap
         }
         renderMap()
-
+        this.FetchBatteryLevel()
     }
 
     FetchRoute(){
@@ -184,6 +185,18 @@ class App extends Component {
             console.log(`Error code:${err}`)})
 
         //Only set Route Coordinate, routeline no effect
+    }
+
+    FetchBatteryLevel(){
+        fetch('http://172.20.10.10:5000')
+        .then(res=>{
+            return res.text()
+        }).then(data=>{
+            //Data return
+            this.setState({
+                BatteryLevel: parseFloat(data)
+            })
+        })
     }
 
     SubmitForm(){
@@ -255,7 +268,7 @@ class App extends Component {
                                     <TableCell align="center">Langtitude</TableCell>
                                     <TableCell align="center">Address</TableCell>
                                     <TableCell align="center">Total Distance (km)</TableCell>
-                                    <TableCell align="center">Enough battery ?</TableCell>
+                                    <TableCell align="center">Battery Level</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -265,7 +278,7 @@ class App extends Component {
                                     <TableCell component="th" scope="row" align='center'>{this.state.currentlongtitude}</TableCell>
                                     <TableCell component="th" scope="row" align='center'>{this.state.currentAddress}</TableCell>
                                     <TableCell component="th" scope="row" align='center' rowSpan='2'>{this.state.distance/1000}</TableCell>
-                                    <TableCell component="th" scope="row" align='center' rowSpan='2'>Testing1</TableCell>
+                                    <TableCell component="th" scope="row" align='center' rowSpan='2'>{this.state.BatteryLevel}</TableCell>
                                 </TableRow>
                                 <TableRow key={'Destination'}>
                                     <TableCell component="th" scope="row" align='center'>Destination</TableCell>

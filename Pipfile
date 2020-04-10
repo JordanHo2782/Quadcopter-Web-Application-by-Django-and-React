@@ -12,7 +12,10 @@ djongo = "*"
 pymongo = {extras = ["srv"],version = "*"}
 jsonfield = "*"
 gunicorn = "*"
+dronekit = "*"
 json = "*"
+requests = "*"
+requests2 = "*"
 
 [requires]
 python_version = "3.7"
