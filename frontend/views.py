@@ -11,8 +11,9 @@ import requests
 @ensure_csrf_cookie
 def index(request):
     # return render(request, 'frontend/index.html')
-    url = 'http://172.20.10.10:5000'
+    url = 'http://192.168.1.13:2000'
     if request.method == 'GET':
+        
         return render(request, 'frontend/index.html')
     elif request.method == 'POST':
         DictPostData = json.loads(request.body) #Dict Data is Dictonary

@@ -22,10 +22,13 @@ class App extends Component {
             currentAddress:'The Hong Kong Polytechnic University',
             targetlatituide: 22.28552,
             targetlongtitude: 114.15769,
+            vehiclelat: 22.28552,
+            vehiclelng: 114.15769,
             targetAddress: 'The Hong Kong Polytechnic University',
             map: null,
             CurrentLocationMarker: null,
             TargetLocationMarker: null,
+            VehicleLocationMarker: null,
             RouteLine: null,
             distance:0,
             BatteryLevel:null,
@@ -46,18 +49,20 @@ class App extends Component {
 
         let AddressInputValue = document.getElementsByName('Destination')[0].value;
 
-        let GeoCodeURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${AddressInputValue}&key=AIzaSyDTSKXMgk0uJMl5ZqrlnwETSLB0dlypp2E`
+        let GeoCodeURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${AddressInputValue}&key=AIzaSyD-1lFWKoyXtGGVa-aZJKv0LEIoNDCs2oE`
 
         fetch(GeoCodeURL).then(res=>{return res.json()}).then(data=>{
             this.setState({
                 targetlatituide: data.results[0].geometry.location.lat,
                 targetlongtitude: data.results[0].geometry.location.lng,
                 targetAddress: data.results[0].formatted_address,
-            })})
+        })})
+        .then(()=>{
             this.state.TargetLocationMarker.setPosition({
             lat: this.state.targetlatituide,
             lng: this.state.targetlongtitude,
-        }).then(()=>{
+        })})
+        .then(()=>{
             this.FetchRoute()
         }).then(()=>{
             this.state.RouteLine.setMap(this.state.map)
@@ -71,7 +76,7 @@ class App extends Component {
 
     componentWillMount(){
         const setLocation = ()=>{
-            let GeoLocateurl = 'https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyDTSKXMgk0uJMl5ZqrlnwETSLB0dlypp2E'
+            let GeoLocateurl = 'https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyD-1lFWKoyXtGGVa-aZJKv0LEIoNDCs2oE'
             
             fetch(GeoLocateurl,{method: 'POST'}).then(res=>{return res.json()}).then(data=>{
               this.setState({
@@ -80,7 +85,7 @@ class App extends Component {
               });
               return {currentlatitude: data.location.lat, currentlongtitude: data.location.lng,}
           }).then(data=>{
-              fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${data.currentlatitude},${data.currentlongtitude}&key=AIzaSyDTSKXMgk0uJMl5ZqrlnwETSLB0dlypp2E`).then(res=>{
+              fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${data.currentlatitude},${data.currentlongtitude}&key=AIzaSyD-1lFWKoyXtGGVa-aZJKv0LEIoNDCs2oE`).then(res=>{
                 return res.json()
               }).then(data=>{
                   this.setState({
@@ -110,7 +115,13 @@ class App extends Component {
                     position: {lat: this.state.targetlatituide, lng: this.state.targetlongtitude},
                     map: this.state.map,
                     title:'Target Location Marker'
-                })
+                }),
+                VehicleLocationMarker: new window.google.maps.Marker({
+                    position: {lat: this.state.currentlatitude, lng: this.state.currentlongtitude},
+                    map: this.state.map,
+                    title: 'Vehicle Marker'
+                }),
+                
             })
 
             this.FetchRoute()
@@ -143,7 +154,7 @@ class App extends Component {
                         lat: this.state.targetlatituide,
                         lng: this.state.targetlongtitude,
                     })
-                    let GeoCodeURL = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${event.latLng.lat()},${event.latLng.lng()}&key=AIzaSyDTSKXMgk0uJMl5ZqrlnwETSLB0dlypp2E`
+                    let GeoCodeURL = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${event.latLng.lat()},${event.latLng.lng()}&key=AIzaSyD-1lFWKoyXtGGVa-aZJKv0LEIoNDCs2oE`
                     fetch(GeoCodeURL).then(res=>{return res.json()}).then(data=>{
                         this.setState({
                             targetAddress: data.results[0].formatted_address
@@ -165,16 +176,15 @@ class App extends Component {
                 script.defer = true
                 index.parentNode.insertBefore(script, index)
             }
-            loadScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyDTSKXMgk0uJMl5ZqrlnwETSLB0dlypp2E&callback=initMap');
+            loadScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyD-1lFWKoyXtGGVa-aZJKv0LEIoNDCs2oE&callback=initMap');
             window.initMap = initMap
         }
         renderMap()
-        this.FetchBatteryLevel()
+        this.FetchVehicleData()
     }
 
     FetchRoute(){
-
-        let RouteURL = `https://maps.googleapis.com/maps/api/directions/json?origin=${this.state.currentlatitude},${this.state.currentlongtitude}&destination=${this.state.targetlatituide},${this.state.targetlongtitude}&avoid=indoor&&key=<DIRECTION_API_KEY>`
+        let RouteURL = `https://maps.googleapis.com/maps/api/directions/json?origin=${this.state.currentlatitude},${this.state.currentlongtitude}&destination=${this.state.targetlatituide},${this.state.targetlongtitude}&avoid=indoor&&key=AIzaSyD-1lFWKoyXtGGVa-aZJKv0LEIoNDCs2oE`
         fetch(RouteURL).then(res=>{return res.json()}).then(data=>{
             let FlightPath = window.google.maps.geometry.encoding.decodePath(data.routes[0].overview_polyline.points)
             this.setState({
@@ -187,14 +197,16 @@ class App extends Component {
         //Only set Route Coordinate, routeline no effect
     }
 
-    FetchBatteryLevel(){
-        fetch('http://172.20.10.10:5000')
+    FetchVehicleData(){
+        fetch('http://192.168.1.119:5000/')
         .then(res=>{
-            return res.text()
-        }).then(data=>{
-            //Data return
+            return res.json()
+        }).then((data/* data is object*/)=>{
+            console.log(data)
             this.setState({
-                BatteryLevel: parseFloat(data)
+                BatteryLevel: data.batterylevel,
+                vehiclelat: data.lat,
+                vehiclelng: data.lon,
             })
         })
     }
@@ -204,14 +216,19 @@ class App extends Component {
             distance: this.state.distance,
             RouteCoordinate: this.state.RouteCoordinate
         };
+        console.log(typeof(data.RouteCoordinate))
+        console.log(JSON.stringify(data.RouteCoordinate))
         let csrftoken = Cookies.get('csrftoken');
-        const fetchURL = window.location.href
+        const fetchURL = 'http://192.168.1.119:5000'
         fetch(fetchURL,{
             method: 'post',
-            body: JSON.stringify(data),
+            body: JSON.stringify(data.RouteCoordinate),
             mode: 'cors',
             credentials: 'same-origin',
-            headers:{ "X-CSRFToken": csrftoken },
+            headers:{ 
+                "X-CSRFToken": csrftoken,
+                "Content-Type": "application/json", 
+         },
         }).then((response)=>{console.log('Post request send sucessfully')
         //console.log(JSON.stringify(formData.get('distance')))
         //console.log(JSON.stringify(response.body))
@@ -220,6 +237,16 @@ class App extends Component {
         console.log('Button Click')
         //POST /database
     }
+    
+    //componentDidMount(){
+        //this.interval = setInterval(()=>{
+            //this.FetchVehicleData()
+        //},10000)
+    //}
+
+    //componentWillUnmount(){
+        //clearInterval(this.interval)
+    //}
 
     render() {
         //console.log(JSON.stringify(this.state.RouteCoordinate))
